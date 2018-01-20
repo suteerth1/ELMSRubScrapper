@@ -8,12 +8,11 @@ GRADES_TXT = "../data/ids.txt"
 TOK_FILE = "../data/auth_tok.txt"
 COOKIES_TXT = "../data/cookies.txt"
 OUTPUT_FOLDER = "../data/grades"
-COURSE_NUMBER = "<COURSE_NUMBER>"
-COURSE_ID = "<COURSE_ID>"
+COURSE_ID = open("../data/course_id.txt",'r').read().strip()
 
 def get_student_ids(access_token_filename, course_number):
     tok = open(access_token_filename).read().strip()
-    url = "https://myelms.umd.edu/api/v1/courses/sis_course_id:" + course_number + "/enrollments"  # + str(course_number) +"/enrollments"
+    url = "https://myelms.umd.edu/api/v1/courses/" + course_number + "/enrollments"  # + str(course_number) +"/enrollments"
     regex_page_number = re.compile("[^_]page=(\d+)")
     req = requests.get(url, data={"access_token": tok, "per_page": 100})
     req_links = req.headers['Link']
@@ -50,7 +49,7 @@ def get_student_pages(cookies_txt, ids, course_id):
 
 
 if __name__ == "__main__":
-    temp = get_student_ids(TOK_FILE, COURSE_NUMBER)
+    temp = get_student_ids(TOK_FILE, COURSE_ID)
     print(temp)
     with open(GRADES_TXT, "w") as putemhere:
         for i in temp:
