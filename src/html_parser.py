@@ -1,11 +1,11 @@
 from bs4 import BeautifulSoup
 import re
-import csv
-
+#import csv
+import json
 
 SUBID_RE = re.compile("submission_(\d+)")
 DIR = "../data/grades"
-OUTPUT = "../data/scores.csv"
+OUTPUT = "../data/scores.json"
 FIELD_NAMES = "../data/field_name.txt"
 
 
@@ -41,9 +41,10 @@ if __name__ == "__main__":
         outf = open(OUTPUT, 'w')
         field_name = [x.strip() for x in open(FIELD_NAMES, 'r').read().split(',')]
         print(field_name)
-        dwriter = csv.DictWriter(outf, fieldnames=field_name)
-
-        dwriter.writeheader()
+        #dwriter = csv.DictWriter(outf, fieldnames=field_name)
+        #dwriter.writeheader()
+        jwriter = outf
+        jwriter.write("[\n")
         for html in lst:
             html = html.split("/")[-1]
             id_ = html
@@ -56,9 +57,14 @@ if __name__ == "__main__":
                 for k in field_name:
                     row[k] = row.get(k, '')
                 print("[+] processed " + row["s_name"] + " id:" + row["s_id"])
-                (dwriter.writerow(row))
+                #(dwriter.writerow(row))
+                j_ = json.dumps(row,  sort_keys=False, indent=4, separators=(',', ': '))
+                jwriter.write(j_)
+                jwriter.write(",")
             except FileNotFoundError:
                 print("[x] File not found")
-
+            except Exception:
+                print("[x]"+id_+"Not processed")
+        jwriter.write('null]')
 
         outf.close()
